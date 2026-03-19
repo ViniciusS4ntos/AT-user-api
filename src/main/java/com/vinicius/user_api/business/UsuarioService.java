@@ -66,7 +66,15 @@ public class UsuarioService {
     }
 
     public void deletarUsuarioPorEmail(String email){
-        usuarioRepository.deleteByEmail(email);
+
+        boolean existeEmail = verificarEmailExistente(email);
+
+        if (existeEmail){
+            usuarioRepository.deleteByEmail(email);
+        } else {
+            throw new ResourceNotFoundException("Email nao encontrado ou nao existente! " + email);
+        }
+
     }
 
     public UsuarioDTO atualizarDadosUsuario(String token, UsuarioDTO dto){
