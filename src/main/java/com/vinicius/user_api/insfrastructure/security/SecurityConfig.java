@@ -1,5 +1,7 @@
 package com.vinicius.user_api.insfrastructure.security;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@SecurityScheme(name = SecurityConfig.SECURITY_SCHEME,type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT", scheme = "bearer")
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+
+    public static final String SECURITY_SCHEME= "bearerAuth";
 
     @Autowired
     public SecurityConfig(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
@@ -40,11 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
 
                         // Libera Swagger
-                        .requestMatchers("/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/webjars/**").permitAll()
-
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         // 🔥 IMPORTANTE: ordem importa
                         .requestMatchers(HttpMethod.GET, "/usuario/endereco/**").permitAll()
 
