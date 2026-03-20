@@ -9,6 +9,9 @@ import com.vinicius.user_api.business.dto.UsuarioDTO;
 import com.vinicius.user_api.insfrastructure.clients.ViaCepDTO;
 import com.vinicius.user_api.insfrastructure.entity.Usuario;
 import com.vinicius.user_api.insfrastructure.security.JwtUtil;
+import com.vinicius.user_api.insfrastructure.security.SecurityConfig;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/usuario")
 @RequiredArgsConstructor
+@Tag(name = "Usuarios")
+@SecurityRequirement(name = SecurityConfig.SECURITY_SCHEME)
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
