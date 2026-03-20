@@ -1,10 +1,12 @@
 package com.vinicius.user_api.controller;
 
 import com.vinicius.user_api.business.UsuarioService;
+import com.vinicius.user_api.business.ViaCepService;
 import com.vinicius.user_api.business.dto.EnderecoDTO;
 import com.vinicius.user_api.business.dto.TelefoneDTO;
 import com.vinicius.user_api.business.dto.UsuarioDTO;
 
+import com.vinicius.user_api.insfrastructure.clients.ViaCepDTO;
 import com.vinicius.user_api.insfrastructure.entity.Usuario;
 import com.vinicius.user_api.insfrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final AuthenticationManager authenticationManager;
+    private final ViaCepService viaCepService;
     private final JwtUtil jwtUtil;
 
     @PostMapping
@@ -79,6 +82,11 @@ public class UsuarioController {
     public ResponseEntity<TelefoneDTO> cadastraTelefone(@RequestBody TelefoneDTO dto,
                                                         @RequestHeader("Authorization") String token){
         return ResponseEntity.ok(usuarioService.cadastraTelefone(token,dto));
+    }
+
+    @GetMapping("/endereco/{cep}")
+    public ResponseEntity<ViaCepDTO> buscarDadosCep(@PathVariable String cep){
+        return ResponseEntity.ok(viaCepService.buscarDadosEndereco(cep));
     }
 
 
