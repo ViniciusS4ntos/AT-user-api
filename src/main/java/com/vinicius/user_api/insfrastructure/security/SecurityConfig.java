@@ -47,6 +47,7 @@ public class SecurityConfig {
 
                         // Libera Swagger
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
                         // 🔥 IMPORTANTE: ordem importa
                         .requestMatchers(HttpMethod.GET, "/usuario/endereco/**").permitAll()
 
