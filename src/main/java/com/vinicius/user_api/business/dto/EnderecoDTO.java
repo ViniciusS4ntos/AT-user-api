@@ -1,5 +1,6 @@
 package com.vinicius.user_api.business.dto;
 
+import com.vinicius.user_api.insfrastructure.entity.Usuario;
 import lombok.*;
 
 @AllArgsConstructor
@@ -16,5 +17,6 @@ public class EnderecoDTO {
     private String cidade;
     private String estado;
     private String cep;
+    private Long usuario_id;
 
 }
