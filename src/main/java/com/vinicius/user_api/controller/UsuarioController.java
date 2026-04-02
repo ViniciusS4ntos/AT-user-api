@@ -7,7 +7,6 @@ import com.vinicius.user_api.business.dto.TelefoneDTO;
 import com.vinicius.user_api.business.dto.UsuarioDTO;
 
 import com.vinicius.user_api.insfrastructure.clients.ViaCepDTO;
-import com.vinicius.user_api.insfrastructure.entity.Usuario;
 import com.vinicius.user_api.insfrastructure.security.JwtUtil;
 import com.vinicius.user_api.insfrastructure.security.SecurityConfig;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -40,12 +39,8 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UsuarioDTO usuarioDTO) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(usuarioDTO.getEmail(),
-                        usuarioDTO.getSenha())
-        );
-        return "Bearer "  + jwtUtil.generateToken(authentication.getName());
+    public ResponseEntity<String> login(@RequestBody UsuarioDTO usuarioDTO) {
+        return ResponseEntity.ok(usuarioService.authenticarUsuario(usuarioDTO));
     }
 
     @GetMapping
