@@ -1,8 +1,5 @@
 package com.vinicius.user_api.insfrastructure.security;
 
-import com.vinicius.user_api.insfrastructure.exception.UnauthorizedException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,71 +23,42 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
         try {
-
-
-            // Pega o header Authorization da requisição
             final String authorizationHeader = request.getHeader("Authorization");
-
             String path = request.getRequestURI();
 
-            // Ignora endpoints do Swagger (não precisa autenticar)
-            if (path.startsWith("/v3/api-docs") ||
-                    path.startsWith("/swagger-ui") ||
-                    path.equals("/swagger-ui.html")) {
-
-                chain.doFilter(request, response); // continua sem validar
+            // 1. Liberação de caminhos que não devem ser filtrados
+            if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui") || path.equals("/swagger-ui.html")) {
+                chain.doFilter(request, response);
                 return;
             }
 
-            // Verifica se existe token e se começa com "Bearer "
+            // 2. Processamento do Token
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                final String token = authorizationHeader.substring(7);
+                final String username = jwtUtil.extractUsername(token);
 
-                final String token = authorizationHeader.substring(7); // remove "Bearer "
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                try {
-                    // Extrai o username do token
-                    final String username = jwtUtil.extractUsername(token);
+                    if (jwtUtil.validateToken(token, userDetails.getUsername())) {
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                    // Se existe username e ainda não está autenticado
-                    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                        // Busca o usuário no banco
-                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                        // Valida o token com o usuário real
-                        if (jwtUtil.validateToken(token, userDetails.getUsername())) {
-
-                            // Cria objeto de autenticação
-                            UsernamePasswordAuthenticationToken authentication =
-                                    new UsernamePasswordAuthenticationToken(
-                                            userDetails,
-                                            null,
-                                            userDetails.getAuthorities()
-                                    );
-
-                            // Define o usuário como autenticado no contexto do Spring
-                            SecurityContextHolder.getContext().setAuthentication(authentication);
-                        }
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
-
-                } catch (Exception e) {
-                    // Se der erro (token inválido, expirado, etc)
-                    System.out.println("Token inválido: " + e.getMessage());
                 }
             }
-
-            // Continua a execução da requisição
-            chain.doFilter(request, response);
-
-        }  catch (ExpiredJwtException | MalformedJwtException e){
-            throw new UnauthorizedException("Erro token invalido ou expirado : ", e.getCause());
-        }  catch (ServletException | IOException e) {
-            throw new RuntimeException("Erro ao realizar authenticação : ", e.getCause());
+        } catch (Exception e) {
+            // Logamos o erro mas deixamos a requisição seguir.
+            // Se o contexto estiver vazio, o Spring Security (SecurityConfig) negará o acesso automaticamente.
+            System.out.println("Erro de autenticação JWT: " + e.getMessage());
         }
 
-
+        // 3. OBRIGATÓRIO: Passar a requisição adiante
+        chain.doFilter(request, response);
     }
 }

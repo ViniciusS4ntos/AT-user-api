@@ -5,6 +5,7 @@ import com.vinicius.user_api.business.converter.UsuarioConverter;
 import com.vinicius.user_api.business.dto.EnderecoDTO;
 import com.vinicius.user_api.business.dto.TelefoneDTO;
 import com.vinicius.user_api.business.dto.UsuarioDTO;
+import com.vinicius.user_api.business.dto.in.UsuarioRequest;
 import com.vinicius.user_api.insfrastructure.entity.Endereco;
 import com.vinicius.user_api.insfrastructure.entity.Telefone;
 import com.vinicius.user_api.insfrastructure.entity.Usuario;
@@ -45,7 +46,7 @@ public class UsuarioService {
         return  usuarioConverter.paraDTO(usuarioRepository.save(usuarioEntity));
     }
 
-    public String  authenticarUsuario(UsuarioDTO usuarioDTO){
+    public String  authenticarUsuario(UsuarioRequest usuarioDTO){
 
         try {
             Authentication authentication = authenticationManager.authenticate(
