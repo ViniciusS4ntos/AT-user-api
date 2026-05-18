@@ -6,6 +6,7 @@ import com.vinicius.user_api.business.dto.EnderecoDTO;
 import com.vinicius.user_api.business.dto.TelefoneDTO;
 import com.vinicius.user_api.business.dto.UsuarioDTO;
 
+import com.vinicius.user_api.business.dto.in.UsuarioRequest;
 import com.vinicius.user_api.insfrastructure.clients.ViaCepDTO;
 import com.vinicius.user_api.insfrastructure.security.JwtUtil;
 import com.vinicius.user_api.insfrastructure.security.SecurityConfig;
@@ -31,7 +32,7 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final AuthenticationManager authenticationManager;
     private final ViaCepService viaCepService;
-    private final JwtUtil jwtUtil;
+
 
     @PostMapping
     public ResponseEntity<UsuarioDTO> salvarUsuario(@RequestBody UsuarioDTO usuarioDTO){
@@ -39,7 +40,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UsuarioDTO usuarioDTO) {
+    public ResponseEntity<String> login(@RequestBody UsuarioRequest usuarioDTO) {
         return ResponseEntity.ok(usuarioService.authenticarUsuario(usuarioDTO));
     }
 
